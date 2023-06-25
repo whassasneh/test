@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>User-Checker</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        #form-messages {
+            background-color: rgb(255, 232, 232);
+            border: 1px solid red;
+            color: red;
+            display: none;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding: 10px 25px;
+            max-width: 250px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="page-title">Check Username</h1>
+    <form id="LoginForm" onsubmit="return false">
+        <div class="form">
+            <ul id="form-messages">
+                <li><!-- Generic Issue --></li>
+            </ul>
+
+            <label for="username">Username</label>
+            <p><img /></p>
+
+            <input type="text" id="username" spellcheck="false">
+
+            <button type="submit" id="btn-submit">Go</button>
+        </div>
+    </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = {
+                username: document.getElementById('username'),
+                submit: document.getElementById('btn-submit'),
+                messages: document.getElementById('form-messages')
+            };
+
+            form.submit.addEventListener('click', async () => {
+                const url = "https://europe-west1-insta-crawler-api.cloudfunctions.net/function-1";
+                const params = form.username.value;
+
+                try {
+                    const response = await fetch(`${url}?name=${params}`);
+                    if (response.ok) {
+                        const responseObject = await response.text();
+                        handleResponse(responseObject);
+                    } else {
+                        displayErrorMessage("Nothing to crawl here");
+                    }
+                } catch (error) {
+                    displayErrorMessage("An error occurred while processing the request");
+                }
+            });
+
+            function displayErrorMessage(message) {
+                form.messages.textContent = message;
+                form.messages.style.display = "block";
+            }
+
+            function handleResponse(responseObject) {
+                if (responseObject === "") {
+                    displayErrorMessage("Nothing to crawl here");
+                } else {
+                    const img = document.createElement('img');
+                    img.src = responseObject;
+                    img.style.border = "10px solid orange";
+                    img.style.borderRadius = "10px";
+                    document.body.appendChild(img);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
